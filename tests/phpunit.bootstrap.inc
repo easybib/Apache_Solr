@@ -10,7 +10,7 @@ ini_set('display_errors', 'On');
 // this is necessary for auto load to work
 set_include_path(
 	// distribution files (where the zip / tgz is unpacked)
-	dirname(dirname(__FILE__)) . PATH_SEPARATOR .
+	dirname(dirname(__FILE__)) . '/src' . PATH_SEPARATOR .
 
 	// test file directory "tests"
 	dirname(__FILE__) . PATH_SEPARATOR .
