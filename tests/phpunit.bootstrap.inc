@@ -19,6 +19,13 @@ set_include_path(
 	get_include_path()
 );
 
+// include composer autoload
+$composerAutoload = dirname(__DIR__) . '/vendor/.composer/autoload.php';
+if (!file_exists($composerAutoload)) {
+    die("Missing '{$composerAutoload}', please run `php composer.phar install` to get vendors.");
+}
+require $composerAutoload;
+
 // set up an autoload for Zend / Pear style class loading
 spl_autoload_register(
 	function($class)
