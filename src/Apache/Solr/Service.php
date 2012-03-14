@@ -172,6 +172,11 @@ class Apache_Solr_Service
 	 */
 	protected $_httpTransport = false;
 
+    /**
+     * @var \Guzzle\Http\Client $httpClient
+     */
+    protected $httpClient;
+
 	/**
 	 * Escape a value for special query characters such as ':', '(', ')', '*', '?', etc.
 	 *
@@ -221,9 +226,11 @@ class Apache_Solr_Service
 	 * @param string $host
 	 * @param string $port
 	 * @param string $path
-	 * @param Apache_Solr_HttpTransport_Interface $httpTransport
+	 * @param Client $httpClient
+     *
+     * @return $this
 	 */
-	public function __construct($host = 'localhost', $port = 8180, $path = '/solr/', $httpTransport = false)
+	public function __construct($host = 'localhost', $port = 8180, $path = '/solr/', Client $httpClient = null)
 	{
 		$this->setHost($host);
 		$this->setPort($port);
@@ -231,9 +238,8 @@ class Apache_Solr_Service
 
 		$this->_initUrls();
 
-		if ($httpTransport)
-		{
-			$this->setHttpTransport($httpTransport);
+		if ($httpClient !== null) {
+			$this->accept($httpClient);
 		}
 
 		// check that our php version is >= 5.1.3 so we can correct for http_build_query behavior later
@@ -319,16 +325,15 @@ class Apache_Solr_Service
 	 */
 	protected function _sendRawGet($url, $timeout = FALSE)
 	{
-		$httpTransport = $this->getHttpTransport();
+		$client   = $this->getHttpClient();
+		$request  = $client->get($url);
+        $response = $this->makeRequest($request, $timeout);
 
-		$httpResponse = $httpTransport->performGetRequest($url, $timeout);
-		$solrResponse = new Apache_Solr_Response($httpResponse, $this->_createDocuments, $this->_collapseSingleValueArrays);
-
-		if ($solrResponse->getHttpStatus() != 200)
-		{
-			throw new Apache_Solr_HttpTransportException($solrResponse);
-		}
-
+		$solrResponse = new Apache_Solr_Response(
+            $response,
+            $this->_createDocuments,
+            $this->_collapseSingleValueArrays
+        );
 		return $solrResponse;
 	}
 
@@ -345,18 +350,78 @@ class Apache_Solr_Service
 	 */
 	protected function _sendRawPost($url, $rawPost, $timeout = FALSE, $contentType = 'text/xml; charset=UTF-8')
 	{
-		$httpTransport = $this->getHttpTransport();
+		$client   = $this->getHttpClient();
+        $request  = $client->post($url, array('Content-Type' => $contentType), $rawPost);
+        $response = $this->makeRequest($request, $timeout);
 
-		$httpResponse = $httpTransport->performPostRequest($url, $rawPost, $contentType, $timeout);
-		$solrResponse = new Apache_Solr_Response($httpResponse, $this->_createDocuments, $this->_collapseSingleValueArrays);
-
-		if ($solrResponse->getHttpStatus() != 200)
-		{
-			throw new Apache_Solr_HttpTransportException($solrResponse);
-		}
-
+		$solrResponse = new Apache_Solr_Response(
+            $response,
+            $this->_createDocuments,
+            $this->_collapseSingleValueArrays
+        );
 		return $solrResponse;
 	}
+
+    /**
+     * Make request against Apache Solr!
+     *
+     * @param Guzzle\Http\Message\Request $request
+     * @param mixed                       $timeout
+     *
+     * @return Guzzle\Http\Message\Response
+     * @throws Apache_Solr_HttpTransportException
+     */
+    protected function makeRequest(Request $request, $timeout)
+    {
+        if ($timeout !== false) {
+            $request->getCurlOptions()->set(CURLOPT_CONNECTTIMEOUT, $timeout);
+        }
+        try {
+            $response = $request->send();
+        } catch (Exception $e) {
+            throw new Apache_Solr_HttpTransportException("Transport error.", null, $e);
+        }
+        if ($response->getStatusCode() != 200) {
+            throw new Apache_Solr_HttpTransportException(
+                $response->getBody(),
+                $response->getStatusCode()
+            );
+        }
+        return $response;
+    }
+
+    /**
+     * An acceptor pattern.
+     *
+     * @param mixed $mixed
+     *
+     * @returns $this
+     * @throws  \InvalidArgumentException
+     */
+    public function accept($mixed)
+    {
+        if ($mixed instanceof Client) {
+            $this->httpClient = $mixed;
+        } else {
+            throw new \InvalidArgumentException("Unknown object/var: " . var_export($mixed, true));
+        }
+        return $this;
+    }
+
+    /**
+     * Returns an instance of the http client, with baseUrl.
+     *
+     * @return \Guzzle\Service\Client
+     */
+    public function getHttpClient()
+    {
+        if ($this->client === null) {
+            $baseUrl          = sprintf("http://%s:%s", $this->getHost(), $this->getPort());
+            $this->httpClient = new Client($url);
+            $this->httpClient->setUserAgent('Apache_Solr');
+        }
+        return $this->httpClient;
+    }
 
 	/**
 	 * Returns the set host
@@ -455,34 +520,6 @@ class Apache_Solr_Service
 		{
 			$this->_initUrls();
 		}
-	}
-
-	/**
-	 * Get the current configured HTTP Transport
-	 *
-	 * @return HttpTransportInterface
-	 */
-	public function getHttpTransport()
-	{
-		// lazy load a default if one has not be set
-		if ($this->_httpTransport === false)
-		{
-			require_once(dirname(__FILE__) . '/HttpTransport/FileGetContents.php');
-
-			$this->_httpTransport = new Apache_Solr_HttpTransport_FileGetContents();
-		}
-
-		return $this->_httpTransport;
-	}
-
-	/**
-	 * Set the HTTP Transport implemenation that will be used for all HTTP requests
-	 *
-	 * @param Apache_Solr_HttpTransport_Interface
-	 */
-	public function setHttpTransport(Apache_Solr_HttpTransport_Interface $httpTransport)
-	{
-		$this->_httpTransport = $httpTransport;
 	}
 
 	/**
