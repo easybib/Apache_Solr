@@ -95,20 +95,20 @@ class Apache_Solr_Service
 	 * NamedList Treatment constants
 	 */
 	const NAMED_LIST_FLAT = 'flat';
-	const NAMED_LIST_MAP = 'map';
+	const NAMED_LIST_MAP  = 'map';
 
 	/**
 	 * Search HTTP Methods
 	 */
-	const METHOD_GET = 'GET';
+	const METHOD_GET  = 'GET';
 	const METHOD_POST = 'POST';
 
 	/**
 	 * Servlet mappings
 	 */
-	const PING_SERVLET = 'admin/ping';
-	const UPDATE_SERVLET = 'update';
-	const SEARCH_SERVLET = 'select';
+	const PING_SERVLET    = 'admin/ping';
+	const UPDATE_SERVLET  = 'update';
+	const SEARCH_SERVLET  = 'select';
 	const THREADS_SERVLET = 'admin/threads';
 	const EXTRACT_SERVLET = 'update/extract';
 
@@ -275,10 +275,10 @@ class Apache_Solr_Service
 	{
 		//Initialize our full servlet URLs now that we have server information
 		$this->_extractUrl = $this->_constructUrl(self::EXTRACT_SERVLET);
-		$this->_pingUrl = $this->_constructUrl(self::PING_SERVLET);
-		$this->_searchUrl = $this->_constructUrl(self::SEARCH_SERVLET);
+		$this->_pingUrl    = $this->_constructUrl(self::PING_SERVLET);
+		$this->_searchUrl  = $this->_constructUrl(self::SEARCH_SERVLET);
 		$this->_threadsUrl = $this->_constructUrl(self::THREADS_SERVLET, array('wt' => self::SOLR_WRITER ));
-		$this->_updateUrl = $this->_constructUrl(self::UPDATE_SERVLET, array('wt' => self::SOLR_WRITER ));
+		$this->_updateUrl  = $this->_constructUrl(self::UPDATE_SERVLET, array('wt' => self::SOLR_WRITER ));
 
 		$this->_urlsInited = true;
 	}
@@ -811,8 +811,8 @@ class Apache_Solr_Service
 	 */
 	public function commit($expungeDeletes = false, $waitFlush = true, $waitSearcher = true, $timeout = 3600)
 	{
-		$expungeValue = $expungeDeletes ? 'true' : 'false';
-		$flushValue = $waitFlush ? 'true' : 'false';
+		$expungeValue  = $expungeDeletes ? 'true' : 'false';
+		$flushValue    = $waitFlush ? 'true' : 'false';
 		$searcherValue = $waitSearcher ? 'true' : 'false';
 
 		$rawPost = '<commit expungeDeletes="' . $expungeValue . '" waitFlush="' . $flushValue . '" waitSearcher="' . $searcherValue . '" />';
