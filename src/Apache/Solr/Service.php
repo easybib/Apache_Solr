@@ -72,8 +72,7 @@ use Guzzle\Http\Message\Request;
  * ...
  * </code>
  *
- * @todo Investigate using other HTTP clients other than file_get_contents built-in handler. Could provide performance
- * improvements when dealing with multiple requests by using HTTP's keep alive functionality
+ * @todo Support auth again.
  */
 class Apache_Solr_Service
 {
