@@ -35,8 +35,11 @@
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
+namespace Apache\Solr;
 
-class Apache_Solr_InvalidArgumentException extends Apache_Solr_Exception
+use Apache\Solr\Exception;
+
+class InvalidArgumentException extends Exception
 {
 	/**
 	 * SVN Revision meta data for this class

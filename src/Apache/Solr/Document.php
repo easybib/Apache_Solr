@@ -36,6 +36,8 @@
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
 
+namespace Apache\Solr;
+
 /**
  * Holds Key / Value pairs that represent a Solr Document along with any associated boost
  * values. Field values can be accessed by direct dereferencing such as:
@@ -55,7 +57,7 @@
  * }
  * </code>
  */
-class Apache_Solr_Document implements IteratorAggregate
+class Document implements \IteratorAggregate
 {
 	/**
 	 * SVN Revision meta data for this class
@@ -138,7 +140,7 @@ class Apache_Solr_Document implements IteratorAggregate
 	 * on field values - this is similar to SolrJ's functionality.
 	 *
 	 * <code>
-	 * $doc = new Apache_Solr_Document();
+	 * $doc = new \Apache\Solr\Document();
 	 *
 	 * $doc->addField('foo', 'bar', 2.0);
 	 * $doc->addField('foo', 'baz', 3.0);
@@ -301,7 +303,7 @@ class Apache_Solr_Document implements IteratorAggregate
 	 */
 	public function getIterator()
 	{
-		$arrayObject = new ArrayObject($this->_fields);
+		$arrayObject = new \ArrayObject($this->_fields);
 
 		return $arrayObject->getIterator();
 	}

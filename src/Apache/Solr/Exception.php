@@ -35,8 +35,9 @@
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
+namespace Apache\Solr;
 
-class Apache_Solr_Exception extends Exception
+class Exception extends \Exception
 {
 	/**
 	 * SVN Revision meta data for this class
