@@ -177,6 +177,16 @@ class Apache_Solr_Service
      */
     protected $httpClient;
 
+    /**
+     * @var string $scheme
+     */
+    protected $scheme = 'http';
+
+    /**
+     * @var int $timeout
+     */
+    protected $timeout = 10;
+
 	/**
 	 * Escape a value for special query characters such as ':', '(', ')', '*', '?', etc.
 	 *
@@ -227,14 +237,24 @@ class Apache_Solr_Service
 	 * @param string $port
 	 * @param string $path
 	 * @param Client $httpClient
+     * @param string $scheme
      *
      * @return $this
 	 */
-	public function __construct($host = 'localhost', $port = 8180, $path = '/solr/', Client $httpClient = null)
-	{
+	public function __construct(
+        $host = 'localhost',
+        $port = 8180,
+        $path = '/solr/',
+        Client $httpClient = null,
+        $scheme = null
+    ) {
 		$this->setHost($host);
 		$this->setPort($port);
 		$this->setPath($path);
+
+        if ($scheme !== null) {
+            $this->setScheme($scheme);
+        }
 
 		$this->_initUrls();
 
@@ -252,26 +272,32 @@ class Apache_Solr_Service
 	 * @param string $servlet
 	 * @return string
 	 */
-	protected function _constructUrl($servlet, $params = array())
+	protected function _constructUrl($servlet, array $params = array())
 	{
-		if (count($params))
-		{
+        $queryString = '';
+		if (count($params)) {
 			//escape all parameters appropriately for inclusion in the query string
+
+            /*
 			$escapedParams = array();
 
-			foreach ($params as $key => $value)
-			{
+			foreach ($params as $key => $value) {
 				$escapedParams[] = urlencode($key) . '=' . urlencode($value);
 			}
 
 			$queryString = $this->_queryDelimiter . implode($this->_queryStringDelimiter, $escapedParams);
-		}
-		else
-		{
-			$queryString = '';
+            */
+            $queryString .= http_build_query($params);
 		}
 
-		return 'http://' . $this->_host . ':' . $this->_port . $this->_path . $servlet . $queryString;
+        return sprintf('%s://%s:%s%s%s%s',
+            $this->scheme,
+            $this->_host,
+            $this->_port,
+            $this->_path,
+            $servlet,
+            $queryString
+        );
 	}
 
 	/**
@@ -373,9 +399,11 @@ class Apache_Solr_Service
      */
     protected function makeRequest(Request $request, $timeout)
     {
-        if ($timeout !== false) {
-            $request->getCurlOptions()->set(CURLOPT_CONNECTTIMEOUT, $timeout);
+        if ($timeout === false) {
+            $timeout = $this->timeout;
         }
+        $request->getCurlOptions()->set(CURLOPT_CONNECTTIMEOUT, $timeout);
+
         try {
             $response = $request->send();
         } catch (Exception $e) {
@@ -522,6 +550,28 @@ class Apache_Solr_Service
 		}
 	}
 
+    /**
+     * Set scheme.
+     *
+     * @param string $scheme
+     *
+     * @return $this
+     * @throws InvalidArgumentException
+     */
+    public function setScheme($scheme)
+    {
+        static $schemes = array('http', 'https');
+
+        $scheme = strtolower($scheme);
+        if (!in_array($scheme, $schemes)) {
+            throw new \InvalidArgumentException(
+                sprintf("Scheme '%s' is not supported.", $scheme)
+            );
+        }
+        $this->scheme = $scheme;
+        return $this;
+    }
+
 	/**
 	 * Set the create documents flag. This determines whether {@link Apache_Solr_Response} objects will
 	 * parse the response and create {@link Apache_Solr_Document} instances in place.
@@ -573,7 +623,7 @@ class Apache_Solr_Service
 	 */
 	public function getDefaultTimeout()
 	{
-		return $this->getHttpTransport()->getDefaultTimeout();
+        return $this->timeout;
 	}
 
 	/**
@@ -585,7 +635,8 @@ class Apache_Solr_Service
 	 */
 	public function setDefaultTimeout($timeout)
 	{
-		$this->getHttpTransport()->setDefaultTimeout($timeout);
+        $this->timeout = $timeout;
+        return $this;
 	}
 
 	/**
