@@ -1,4 +1,5 @@
 <?php
+require_once 'PHPUnit/Autoload.php';
 
 // set error reporting high
 error_reporting(E_ALL | E_STRICT);
@@ -15,11 +16,3 @@ if (!file_exists($composerAutoload)) {
     die("Missing '{$composerAutoload}', please run `php composer.phar install` to get vendors.");
 }
 require $composerAutoload;
-
-// set up an autoload for Zend / Pear style class loading
-spl_autoload_register(
-	function($class)
-	{
-		include(str_replace("_", DIRECTORY_SEPARATOR, $class) . ".php");
-	}
-);

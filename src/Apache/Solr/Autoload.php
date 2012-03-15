@@ -15,11 +15,13 @@ class Autoload
         if (strpos($class, 'Apache_Solr') === false) {
             return false;
         }
+        $base = dirname(dirname(dirname(__DIR__)));
         if (strpos($class, 'Test') !== false) {
-            return false;
+            $base .= '/tests';
+        } else {
+            $base .= '/src';
         }
-        $file = str_replace('Apache_Solr_', '', $class);
-        $file = str_replace('_', '/', $file);
-        return include __DIR__ . '/' . $file . '.php';
+        $file = str_replace('_', '/', $class);
+        return include $base . '/' . $file . '.php';
     }
 }
