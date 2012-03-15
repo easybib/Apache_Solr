@@ -80,7 +80,7 @@ class HttpTest extends ServiceAbstractTest
     }
 
     /**
-     * @expectedException \Apache\Solr\InvalidArgumentException
+     * @expectedException Apache\Solr\InvalidArgumentException
      */
     public function testSearchWithInvalidMethod()
     {

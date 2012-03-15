@@ -112,7 +112,7 @@ class ServiceTest extends ServiceAbstractTest
 	}
 	
 	/**
-	 * @expectedException Apache_Solr_InvalidArgumentException
+	 * @expectedException Apache\Solr\InvalidArgumentException
 	 */
 	public function testSetNamedListTreatmentInvalidArgumentException()
 	{
@@ -154,7 +154,7 @@ class ServiceTest extends ServiceAbstractTest
 	}
 	
 	/**
-	 * @expectedException Apache_Solr_InvalidArgumentException
+	 * @expectedException Apache\Solr\InvalidArgumentException
 	 */
 	public function testSetEmptyHost()
 	{
@@ -194,7 +194,7 @@ class ServiceTest extends ServiceAbstractTest
 	}
 	
 	/**
-	 * @expectedException Apache_Solr_InvalidArgumentException
+	 * @expectedException Apache\Solr\InvalidArgumentException
 	 */
 	public function testSetPortWithInvalidArgument()
 	{

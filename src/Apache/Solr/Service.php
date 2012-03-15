@@ -40,6 +40,7 @@ namespace Apache\Solr;
 use Guzzle\Http\Client;
 use Guzzle\Http\Message\Request;
 
+use Apache\Solr\Document;
 use Apache\Solr\InvalidArgumentException;
 
 /**
@@ -49,13 +50,13 @@ use Apache\Solr\InvalidArgumentException;
  * Example Usage:
  * <code>
  * ...
- * $solr = new Apache_Solr_Service(); //or explicitly new Apache_Solr_Service('localhost', 8180, '/solr')
+ * $solr = new Service(); //or explicitly new Service('localhost', 8180, '/solr')
  *
  * if ($solr->ping())
  * {
  * 		$solr->deleteByQuery('*:*'); //deletes ALL documents - be careful :)
  *
- * 		$document = new Apache_Solr_Document();
+ * 		$document = new Document();
  * 		$document->id = uniqid(); //or something else suitably unique
  *
  * 		$document->title = 'Some Title';
@@ -123,7 +124,7 @@ class Service
 	protected $_host, $_port, $_path;
 
 	/**
-	 * Whether {@link Apache_Solr_Response} objects should create {@link Apache_Solr_Document}s in
+	 * Whether {@link Response} objects should create {@link Document}s in
 	 * the returned parsed data
 	 *
 	 * @var boolean
@@ -131,7 +132,7 @@ class Service
 	protected $_createDocuments = true;
 
 	/**
-	 * Whether {@link Apache_Solr_Response} objects should have multivalue fields with only a single value
+	 * Whether {@link Response} objects should have multivalue fields with only a single value
 	 * collapsed to appear as a single value would.
 	 *
 	 * @var boolean
@@ -140,7 +141,7 @@ class Service
 
 	/**
 	 * How NamedLists should be formatted in the output.  This specifically effects facet counts. Valid values
-	 * are {@link Apache_Solr_Service::NAMED_LIST_MAP} (default) or {@link Apache_Solr_Service::NAMED_LIST_FLAT}.
+	 * are {@link Service::NAMED_LIST_MAP} (default) or {@link Service::NAMED_LIST_FLAT}.
 	 *
 	 * @var string
 	 */
@@ -299,9 +300,7 @@ class Service
 	 *
 	 * @param string $url
 	 * @param float $timeout Read timeout in seconds
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If a non 200 response status is returned
+	 * @return Response
 	 */
 	protected function _sendRawGet($url, $timeout = FALSE)
 	{
@@ -309,7 +308,7 @@ class Service
 		$request  = $client->get($url);
         $response = $this->makeRequest($request, $timeout);
 
-		$solrResponse = new Apache_Solr_Response(
+		$solrResponse = new Response(
             $response,
             $this->_createDocuments,
             $this->_collapseSingleValueArrays
@@ -324,9 +323,7 @@ class Service
 	 * @param string $rawPost
 	 * @param float $timeout Read timeout in seconds
 	 * @param string $contentType
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If a non 200 response status is returned
+	 * @return Response
 	 */
 	protected function _sendRawPost($url, $rawPost, $timeout = FALSE, $contentType = 'text/xml; charset=UTF-8')
 	{
@@ -334,7 +331,7 @@ class Service
         $request  = $client->post($url, array('Content-Type' => $contentType), $rawPost);
         $response = $this->makeRequest($request, $timeout);
 
-		$solrResponse = new Apache_Solr_Response(
+		$solrResponse = new Response(
             $response,
             $this->_createDocuments,
             $this->_collapseSingleValueArrays
@@ -427,14 +424,14 @@ class Service
 	 *
 	 * @param string $host
 	 *
-	 * @throws Apache_Solr_InvalidArgumentException If the host parameter is empty
+	 * @throws InvalidArgumentException If the host parameter is empty
 	 */
 	public function setHost($host)
 	{
 		//Use the provided host or use the default
 		if (empty($host))
 		{
-			throw new Apache_Solr_InvalidArgumentException('Host parameter is empty');
+			throw new InvalidArgumentException('Host parameter is empty');
 		}
 		else
 		{
@@ -462,7 +459,7 @@ class Service
 	 *
 	 * @param integer $port
 	 *
-	 * @throws Apache_Solr_InvalidArgumentException If the port parameter is empty
+	 * @throws InvalidArgumentException If the port parameter is empty
 	 */
 	public function setPort($port)
 	{
@@ -471,7 +468,7 @@ class Service
 
 		if ($port <= 0)
 		{
-			throw new Apache_Solr_InvalidArgumentException('Port is not a valid port number');
+			throw new InvalidArgumentException('Port is not a valid port number');
 		}
 		else
 		{
@@ -534,8 +531,8 @@ class Service
     }
 
 	/**
-	 * Set the create documents flag. This determines whether {@link Apache_Solr_Response} objects will
-	 * parse the response and create {@link Apache_Solr_Document} instances in place.
+	 * Set the create documents flag. This determines whether {@link Response} objects will
+	 * parse the response and create {@link Document} instances in place.
 	 *
 	 * @param boolean $createDocuments
 	 */
@@ -681,9 +678,7 @@ class Service
 	 * Call the /admin/threads servlet and retrieve information about all threads in the
 	 * Solr servlet's thread group. Useful for diagnostics.
 	 *
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function threads()
 	{
@@ -695,9 +690,7 @@ class Service
 	 * should be a complete and well formed "add" xml document.
 	 *
 	 * @param string $rawPost
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function add($rawPost)
 	{
@@ -707,16 +700,14 @@ class Service
 	/**
 	 * Add a Solr Document to the index
 	 *
-	 * @param Apache_Solr_Document $document
+	 * @param Document $document
 	 * @param boolean $allowDups
 	 * @param boolean $overwritePending
 	 * @param boolean $overwriteCommitted
 	 * @param integer $commitWithin The number of milliseconds that a document must be committed within, see @{link http://wiki.apache.org/solr/UpdateXmlMessages#The_Update_Schema} for details.  If left empty this property will not be set in the request.
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
-	public function addDocument(Apache_Solr_Document $document, $allowDups = false, $overwritePending = true, $overwriteCommitted = true, $commitWithin = 0)
+	public function addDocument(Document $document, $allowDups = false, $overwritePending = true, $overwriteCommitted = true, $commitWithin = 0)
 	{
 		$dupValue = $allowDups ? 'true' : 'false';
 		$pendingValue = $overwritePending ? 'true' : 'false';
@@ -735,14 +726,12 @@ class Service
 	/**
 	 * Add an array of Solr Documents to the index all at once
 	 *
-	 * @param array $documents Should be an array of Apache_Solr_Document instances
+	 * @param array $documents Should be an array of Document instances
 	 * @param boolean $allowDups
 	 * @param boolean $overwritePending
 	 * @param boolean $overwriteCommitted
 	 * @param integer $commitWithin The number of milliseconds that a document must be committed within, see @{link http://wiki.apache.org/solr/UpdateXmlMessages#The_Update_Schema} for details.  If left empty this property will not be set in the request.
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function addDocuments($documents, $allowDups = false, $overwritePending = true, $overwriteCommitted = true, $commitWithin = 0)
 	{
@@ -757,7 +746,7 @@ class Service
 
 		foreach ($documents as $document)
 		{
-			if ($document instanceof Apache_Solr_Document)
+			if ($document instanceof Document)
 			{
 				$rawPost .= $this->_documentToXmlFragment($document);
 			}
@@ -769,11 +758,11 @@ class Service
 	}
 
 	/**
-	 * Create an XML fragment from a {@link Apache_Solr_Document} instance appropriate for use inside a Solr add call
+	 * Create an XML fragment from a {@link Document} instance appropriate for use inside a Solr add call
 	 *
 	 * @return string
 	 */
-	protected function _documentToXmlFragment(Apache_Solr_Document $document)
+	protected function _documentToXmlFragment(Document $document)
 	{
 		$xml = '<doc';
 
@@ -849,9 +838,7 @@ class Service
 	 * @param boolean $waitFlush Defaults to true,  block until index changes are flushed to disk
 	 * @param boolean $waitSearcher Defaults to true, block until a new searcher is opened and registered as the main query searcher, making the changes visible
 	 * @param float $timeout Maximum expected duration (in seconds) of the commit operation on the server (otherwise, will throw a communication exception). Defaults to 1 hour
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function commit($expungeDeletes = false, $waitFlush = true, $waitSearcher = true, $timeout = 3600)
 	{
@@ -870,9 +857,7 @@ class Service
 	 *
 	 * @param string $rawPost Expected to be utf-8 encoded xml document
 	 * @param float $timeout Maximum expected duration of the delete operation on the server (otherwise, will throw a communication exception)
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function delete($rawPost, $timeout = 3600)
 	{
@@ -886,9 +871,7 @@ class Service
 	 * @param boolean $fromPending
 	 * @param boolean $fromCommitted
 	 * @param float $timeout Maximum expected duration of the delete operation on the server (otherwise, will throw a communication exception)
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function deleteById($id, $fromPending = true, $fromCommitted = true, $timeout = 3600)
 	{
@@ -910,9 +893,7 @@ class Service
 	 * @param boolean $fromPending
 	 * @param boolean $fromCommitted
 	 * @param float $timeout Maximum expected duration of the delete operation on the server (otherwise, will throw a communication exception)
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function deleteByMultipleIds($ids, $fromPending = true, $fromCommitted = true, $timeout = 3600)
 	{
@@ -941,9 +922,7 @@ class Service
 	 * @param boolean $fromPending
 	 * @param boolean $fromCommitted
 	 * @param float $timeout Maximum expected duration of the delete operation on the server (otherwise, will throw a communication exception)
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function deleteByQuery($rawQuery, $fromPending = true, $fromCommitted = true, $timeout = 3600)
 	{
@@ -962,19 +941,19 @@ class Service
 	 * Use Solr Cell to extract document contents. See {@link http://wiki.apache.org/solr/ExtractingRequestHandler} for information on how
 	 * to use Solr Cell and what parameters are available.
 	 *
-	 * NOTE: when passing an Apache_Solr_Document instance, field names and boosts will automatically be prepended by "literal." and "boost."
+	 * NOTE: when passing an Document instance, field names and boosts will automatically be prepended by "literal." and "boost."
 	 * as appropriate. Any keys from the $params array will NOT be treated this way. Any mappings from the document will overwrite key / value
 	 * pairs in the params array if they have the same name (e.g. you pass a "literal.id" key and value in your $params array but you also
 	 * pass in a document isntance with an "id" field" - the document's value(s) will take precedence).
 	 *
 	 * @param string $file Path to file to extract data from
 	 * @param array $params optional array of key value pairs that will be sent with the post (see Solr Cell documentation)
-	 * @param Apache_Solr_Document $document optional document that will be used to generate post parameters (literal.* and boost.* params)
+	 * @param Document $document optional document that will be used to generate post parameters (literal.* and boost.* params)
 	 * @param string $mimetype optional mimetype specification (for the file being extracted)
 	 *
-	 * @return Apache_Solr_Response
+	 * @return Response
 	 *
-	 * @throws Apache_Solr_InvalidArgumentException if $file, $params, or $document are invalid.
+	 * @throws InvalidArgumentException if $file, $params, or $document are invalid.
 	 */
 	public function extract($file, $params = array(), $document = null, $mimetype = 'application/octet-stream')
 	{
@@ -983,7 +962,7 @@ class Service
 		{
 			if (!is_array($params))
 			{
-				throw new Apache_Solr_InvalidArgumentException("\$params must be a valid array or null");
+				throw new InvalidArgumentException("\$params must be a valid array or null");
 			}
 		}
 		else
@@ -1013,7 +992,7 @@ class Service
 		}
 		else
 		{
-			throw new Apache_Solr_InvalidArgumentException("File '{$file}' is empty or could not be read");
+			throw new InvalidArgumentException("File '{$file}' is empty or could not be read");
 		}
 	}
 	
@@ -1021,19 +1000,19 @@ class Service
 	 * Use Solr Cell to extract document contents. See {@link http://wiki.apache.org/solr/ExtractingRequestHandler} for information on how
 	 * to use Solr Cell and what parameters are available.
 	 *
-	 * NOTE: when passing an Apache_Solr_Document instance, field names and boosts will automatically be prepended by "literal." and "boost."
+	 * NOTE: when passing an Document instance, field names and boosts will automatically be prepended by "literal." and "boost."
 	 * as appropriate. Any keys from the $params array will NOT be treated this way. Any mappings from the document will overwrite key / value
 	 * pairs in the params array if they have the same name (e.g. you pass a "literal.id" key and value in your $params array but you also
 	 * pass in a document isntance with an "id" field" - the document's value(s) will take precedence).
 	 *
 	 * @param string $data Data that will be passed to Solr Cell
 	 * @param array $params optional array of key value pairs that will be sent with the post (see Solr Cell documentation)
-	 * @param Apache_Solr_Document $document optional document that will be used to generate post parameters (literal.* and boost.* params)
+	 * @param Document $document optional document that will be used to generate post parameters (literal.* and boost.* params)
 	 * @param string $mimetype optional mimetype specification (for the file being extracted)
 	 *
-	 * @return Apache_Solr_Response
+	 * @return Response
 	 *
-	 * @throws Apache_Solr_InvalidArgumentException if $file, $params, or $document are invalid.
+	 * @throws InvalidArgumentException if $file, $params, or $document are invalid.
 	 *
 	 * @todo Should be using multipart/form-data to post parameter values, but I could not get my implementation to work. Needs revisisted.
 	 */
@@ -1044,7 +1023,7 @@ class Service
 		{
 			if (!is_array($params))
 			{
-				throw new Apache_Solr_InvalidArgumentException("\$params must be a valid array or null");
+				throw new InvalidArgumentException("\$params must be a valid array or null");
 			}
 		}
 		else
@@ -1056,8 +1035,8 @@ class Service
 		$params['wt'] = self::SOLR_WRITER;
 		$params['json.nl'] = $this->_namedListTreatment;
 
-		// check if $document is an Apache_Solr_Document instance
-		if (!is_null($document) && $document instanceof Apache_Solr_Document)
+		// check if $document is an Document instance
+		if (!is_null($document) && $document instanceof Document)
 		{
 			// iterate document, adding literal.* and boost.* fields to $params as appropriate
 			foreach ($document as $field => $fieldValue)
@@ -1086,19 +1065,19 @@ class Service
 	 * Use Solr Cell to extract document contents. See {@link http://wiki.apache.org/solr/ExtractingRequestHandler} for information on how
 	 * to use Solr Cell and what parameters are available.
 	 *
-	 * NOTE: when passing an Apache_Solr_Document instance, field names and boosts will automatically be prepended by "literal." and "boost."
+	 * NOTE: when passing an Document instance, field names and boosts will automatically be prepended by "literal." and "boost."
 	 * as appropriate. Any keys from the $params array will NOT be treated this way. Any mappings from the document will overwrite key / value
 	 * pairs in the params array if they have the same name (e.g. you pass a "literal.id" key and value in your $params array but you also
 	 * pass in a document isntance with an "id" field" - the document's value(s) will take precedence).
 	 *
 	 * @param string $url URL
 	 * @param array $params optional array of key value pairs that will be sent with the post (see Solr Cell documentation)
-	 * @param Apache_Solr_Document $document optional document that will be used to generate post parameters (literal.* and boost.* params)
+	 * @param Document $document optional document that will be used to generate post parameters (literal.* and boost.* params)
 	 * @param string $mimetype optional mimetype specification (for the file being extracted)
 	 *
-	 * @return Apache_Solr_Response
+	 * @return Response
 	 *
-	 * @throws Apache_Solr_InvalidArgumentException if $url, $params, or $document are invalid.
+	 * @throws InvalidArgumentException if $url, $params, or $document are invalid.
 	 */
 	public function extractFromUrl($url, $params = array(), $document = null, $mimetype = 'application/octet-stream')
 	{
@@ -1107,7 +1086,7 @@ class Service
 		{
 			if (!is_array($params))
 			{
-				throw new Apache_Solr_InvalidArgumentException("\$params must be a valid array or null");
+				throw new InvalidArgumentException("\$params must be a valid array or null");
 			}
 		}
 		else
@@ -1131,7 +1110,7 @@ class Service
 			// delegate the rest to extractFromString
 			return $this->extractFromString($response->getBody(), $params, $document, $mimetype);
 		}
-        throw new Apache_Solr_InvalidArgumentException("URL '{$url}' returned non 200 response code");
+        throw new InvalidArgumentException("URL '{$url}' returned non 200 response code");
 	}
 
 	/**
@@ -1141,9 +1120,7 @@ class Service
 	 * @param boolean $waitFlush
 	 * @param boolean $waitSearcher
 	 * @param float $timeout Maximum expected duration of the commit operation on the server (otherwise, will throw a communication exception)
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
+	 * @return Response
 	 */
 	public function optimize($waitFlush = true, $waitSearcher = true, $timeout = 3600)
 	{
@@ -1162,11 +1139,9 @@ class Service
 	 * @param int $offset The starting offset for result documents
 	 * @param int $limit The maximum number of result documents to return
 	 * @param array $params key / value pairs for other query parameters (see Solr documentation), use arrays for parameter keys used more than once (e.g. facet.field)
-	 * @param string $method The HTTP method (Apache_Solr_Service::METHOD_GET or Apache_Solr_Service::METHOD::POST)
-	 * @return Apache_Solr_Response
-	 *
-	 * @throws Apache_Solr_HttpTransportException If an error occurs during the service call
-	 * @throws Apache_Solr_InvalidArgumentException If an invalid HTTP method is used
+	 * @param string $method The HTTP method (Service::METHOD_GET or Service::METHOD::POST)
+	 * @return Response
+	 * @throws InvalidArgumentException If an invalid HTTP method is used
 	 */
 	public function search($query, $offset = 0, $limit = 10, $params = array(), $method = self::METHOD_GET)
 	{
@@ -1176,7 +1151,7 @@ class Service
 			if (!is_array($params))
 			{
 				// params was specified but was not an array - invalid
-				throw new Apache_Solr_InvalidArgumentException("\$params must be a valid array or null");
+				throw new InvalidArgumentException("\$params must be a valid array or null");
 			}
 		}
 		else
@@ -1204,9 +1179,6 @@ class Service
 		{
 			return $this->_sendRawPost($this->_searchUrl, $queryString, FALSE, 'application/x-www-form-urlencoded; charset=UTF-8');
 		}
-		else
-		{
-			throw new Apache_Solr_InvalidArgumentException("Unsupported method '$method', please use the Apache_Solr_Service::METHOD_* constants");
-		}
+        throw new InvalidArgumentException("Unsupported method '$method', please use the Service::METHOD_* constants");
 	}
 }
