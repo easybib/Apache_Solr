@@ -1,0 +1,26 @@
+{
+    "hash": "2d9e0870d36bb4c58d036f0912201811",
+    "packages": [
+        {
+            "package": "doctrine/common",
+            "version": "dev-master",
+            "source-reference": "ad2a3385ec88ae4f1c7456aa07a926e6376f219a"
+        },
+        {
+            "package": "guzzle/guzzle",
+            "version": "dev-master",
+            "source-reference": "46d50a577c5a48974dd358d032908a1470d71a1c"
+        },
+        {
+            "package": "symfony/event-dispatcher",
+            "version": "dev-master",
+            "source-reference": "f6b7f60b0c29ab8167de7d7c9ba78fc9cc283c64"
+        },
+        {
+            "package": "symfony/validator",
+            "version": "dev-master",
+            "source-reference": "2c507eb8587d472d98f7c4df3c32a123800121ce"
+        }
+    ],
+    "aliases": []
+}
