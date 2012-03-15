@@ -30,6 +30,7 @@
  * @copyright Copyright 2007-2011 Servigistics, Inc. (http://servigistics.com)
  * @license http://solr-php-client.googlecode.com/svn/trunk/COPYING New BSD
  *
+ * @category   Testing
  * @package    Apache
  * @subpackage Solr
  * @author     Donovan Jimenez <djimenez@conduit-it.com>
