@@ -34,92 +34,21 @@
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
+namespace Apache\Solr;
+
+use Apache\Solr\Service;
+use Apache\Solr\Service\Balancer;
 
 /**
- * Provides base funcationality test for both Apache_Solr_Service and the
- * Apache_Solr_Service_Balancer classes. 
+ * Provides base funcationality test for both Service and the
+ * Balancer classes. 
  */
-abstract class Apache_Solr_ServiceAbstractTest extends PHPUnit_Framework_TestCase
+abstract class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * Method that gets the appropriate instance for testing
 	 */
 	abstract public function getFixture();
-	
-	/**
-	 * @dataProvider testEscapeDataProvider
-	 */
-	public function testEscape($input, $expectedOutput)
-	{
-		$fixture = $this->getFixture();
-		
-		$this->assertEquals($expectedOutput, $fixture->escape($input));
-	}
-	
-	public function testEscapeDataProvider()
-	{
-		return array(
-			array(
-				"I should look the same",
-				"I should look the same"
-			),
-			
-			array(
-				"(There) are: ^lots \\ && of spec!al charaters",
-				"\\(There\\) are\\: \\^lots \\\\ \\&& of spec\\!al charaters"
-			)
-		);
-	}
-	
-	/**
-	 * @dataProvider testEscapePhraseDataProvider
-	 */
-	public function testEscapePhrase($input, $expectedOutput)
-	{
-		$fixture = $this->getFixture();
-		
-		$this->assertEquals($expectedOutput, $fixture->escapePhrase($input));
-	}
-	
-	public function testEscapePhraseDataProvider()
-	{
-		return array(
-			array(
-				"I'm a simple phrase",
-				"I'm a simple phrase"
-			),
-		
-			array(
-				"I have \"phrase\" characters",
-				'I have \\"phrase\\" characters'
-			)
-		);
-	}
-	
-	/**
-	 * @dataProvider testPhraseDataProvider
-	 */
-	public function testPhrase($input, $expectedOutput)
-	{
-		$fixture = $this->getFixture();
-		
-		$this->assertEquals($expectedOutput, $fixture->phrase($input));
-	}
-	
-	public function testPhraseDataProvider()
-	{
-		return array(
-			array(
-				"I'm a simple phrase",
-				'"I\'m a simple phrase"'
-			),
-			
-			array(
-				"I have \"phrase\" characters",
-				'"I have \\"phrase\\" characters"'
-			)
-		);
-	}
 	
 	public function testGetCreateDocumentWithDefaultConstructor()
 	{

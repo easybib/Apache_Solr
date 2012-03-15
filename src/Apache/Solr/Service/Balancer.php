@@ -81,14 +81,14 @@ class Balancer
 	/**
 	 * Escape a value for special query characters such as ':', '(', ')', '*', '?', etc.
 	 *
-	 * NOTE: inside a phrase fewer characters need escaped, use {@link Apache_Solr_Service::escapePhrase()} instead
+	 * NOTE: inside a phrase fewer characters need escaped, use {@link Service::escapePhrase()} instead
 	 *
 	 * @param string $value
 	 * @return string
 	 */
 	static public function escape($value)
 	{
-		return Apache_Solr_Service::escape($value);
+		return Helper::escape($value);
 	}
 
 	/**
@@ -99,7 +99,7 @@ class Balancer
 	 */
 	static public function escapePhrase($value)
 	{
-		return Apache_Solr_Service::escapePhrase($value);
+		return Helper::escapePhrase($value);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Balancer
 	 */
 	static public function phrase($value)
 	{
-		return Apache_Solr_Service::phrase($value);
+		return Helper::phrase($value);
 	}
 
 	/**

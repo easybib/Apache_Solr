@@ -184,48 +184,6 @@ class Service
     protected $timeout = 10;
 
 	/**
-	 * Escape a value for special query characters such as ':', '(', ')', '*', '?', etc.
-	 *
-	 * NOTE: inside a phrase fewer characters need escaped, use {@link Apache_Solr_Service::escapePhrase()} instead
-	 *
-	 * @param string $value
-	 * @return string
-	 */
-	static public function escape($value)
-	{
-		//list taken from http://lucene.apache.org/java/docs/queryparsersyntax.html#Escaping%20Special%20Characters
-		$pattern = '/(\+|-|&&|\|\||!|\(|\)|\{|}|\[|]|\^|"|~|\*|\?|:|\\\)/';
-		$replace = '\\\$1';
-
-		return preg_replace($pattern, $replace, $value);
-	}
-
-	/**
-	 * Escape a value meant to be contained in a phrase for special query characters
-	 *
-	 * @param string $value
-	 * @return string
-	 */
-	static public function escapePhrase($value)
-	{
-		$pattern = '/("|\\\)/';
-		$replace = '\\\$1';
-
-		return preg_replace($pattern, $replace, $value);
-	}
-
-	/**
-	 * Convenience function for creating phrase syntax from a value
-	 *
-	 * @param string $value
-	 * @return string
-	 */
-	static public function phrase($value)
-	{
-		return '"' . self::escapePhrase($value) . '"';
-	}
-
-	/**
 	 * Constructor. All parameters are optional and will take on default values
 	 * if not specified.
 	 *
