@@ -395,7 +395,7 @@ class Apache_Solr_Service
      * @param mixed                       $timeout
      *
      * @return Guzzle\Http\Message\Response
-     * @throws Apache_Solr_HttpTransportException
+     * @throws \RuntimeException
      */
     protected function makeRequest(Request $request, $timeout)
     {
@@ -407,10 +407,14 @@ class Apache_Solr_Service
         try {
             $response = $request->send();
         } catch (Exception $e) {
-            throw new Apache_Solr_HttpTransportException("Transport error.", null, $e);
+            throw new \RuntimeException(
+                "Transport error: {$this->getHost()}:{$this->getPort()}{$this->getPath()}",
+                null,
+                $e
+            );
         }
         if ($response->getStatusCode() != 200) {
-            throw new Apache_Solr_HttpTransportException(
+            throw new \RuntimeException(
                 $response->getBody(),
                 $response->getStatusCode()
             );
