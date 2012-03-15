@@ -36,15 +36,20 @@
  * @author     Donovan Jimenez <djimenez@conduit-it.com>
  * @author     Till Klampaeckel <till@php.net>
  */
+namespace Apache\Solr\Service;
+
+use Apache\Solr\ServiceAbstractTest;
+use Apache\Solr\Service;
+use Guzzle\Http\Client;
 
 /**
  * Put HTTP related tests here.
  */
-class Apache_Solr_Service_HttpTest extends Apache_Solr_ServiceAbstractTest
+class HttpTest extends ServiceAbstractTest
 {
     public function getFixture()
     {
-        return new Apache_Solr_Service();
+        return new Service();
     }
 
     /**
@@ -54,7 +59,7 @@ class Apache_Solr_Service_HttpTest extends Apache_Solr_ServiceAbstractTest
      */
     public function getMockHttpTransportInterface()
     {
-        $guzzle = new \Guzzle\Http\Client();
+        $guzzle = new Client();
         return $guzzle;
     }
 
@@ -69,13 +74,13 @@ class Apache_Solr_Service_HttpTest extends Apache_Solr_ServiceAbstractTest
 
         $mockTransport = $this->getMockHttpTransportInterface();
 
-        $this->assertInstanceOf('Apache_Solr_Service', $fixture->accept($mockTransport));
+        $this->assertInstanceOf('\Apache\Solr\Service', $fixture->accept($mockTransport));
 
         $this->assertInternalType('int', $fixture->getDefaultTimeout());
     }
 
     /**
-     * @expectedException Apache_Solr_InvalidArgumentException
+     * @expectedException \Apache\Solr\InvalidArgumentException
      */
     public function testSearchWithInvalidMethod()
     {

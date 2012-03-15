@@ -35,7 +35,10 @@
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
+namespace Apache\Solr;
 
+use Apache\Solr\ParserException;
+use Apache\Solr\Document;
 use Guzzle\Http\Message\Response as HttpResponse;
 
 /**
@@ -45,7 +48,7 @@ use Guzzle\Http\Message\Response as HttpResponse;
  * Currently requires json_decode which is bundled with PHP >= 5.2.0, Alternatively can be
  * installed with PECL.  Zend Framework also includes a purely PHP solution.
  */
-class Apache_Solr_Response
+class Response
 {
 	/**
 	 * SVN Revision meta data for this class
@@ -60,7 +63,7 @@ class Apache_Solr_Response
 	/**
 	 * Holds the raw response used in construction
 	 *
-	 * @var Apache_Solr_HttpTransport_Response HTTP response
+	 * @var Response HTTP response
 	 */
 	protected $_response;
 
@@ -90,9 +93,9 @@ class Apache_Solr_Response
 	/**
 	 * Constructor. Takes the raw HTTP response body and the exploded HTTP headers
 	 *
-	 * @return Apache_Solr_HttpTransport_Response HTTP response
+	 * @return Response HTTP response
      *
-	 * @param boolean $createDocuments Whether to convert the documents json_decoded as stdClass instances to Apache_Solr_Document instances
+	 * @param boolean $createDocuments Whether to convert the documents json_decoded as stdClass instances to Apache\Solr\Document instances
 	 * @param boolean $collapseSingleValueArrays Whether to make multivalued fields appear as single values
 	 */
 	public function __construct(HttpResponse $response, $createDocuments = true, $collapseSingleValueArrays = true)
@@ -194,7 +197,7 @@ class Apache_Solr_Response
 	/**
 	 * Parse the raw response into the parsed_data array for access
 	 *
-	 * @throws Apache_Solr_ParserException If the data could not be parsed
+	 * @throws ParserException If the data could not be parsed
 	 */
 	protected function _parseData()
 	{
@@ -204,10 +207,10 @@ class Apache_Solr_Response
 		// check that we receive a valid JSON response - we should never receive a null
 		if ($data === null)
 		{
-			throw new Apache_Solr_ParserException('Solr response does not appear to be valid JSON, please examine the raw response with getRawResponse() method');
+			throw new ParserException('Solr response does not appear to be valid JSON, please examine the raw response with getRawResponse() method');
 		}
 
-		//if we're configured to collapse single valued arrays or to convert them to Apache_Solr_Document objects
+		//if we're configured to collapse single valued arrays or to convert them to Apache\Solr\Document objects
 		//and we have response documents, then try to collapse the values and / or convert them now
 		if (($this->_createDocuments || $this->_collapseSingleValueArrays) && isset($data->response) && is_array($data->response->docs))
 		{
@@ -217,7 +220,7 @@ class Apache_Solr_Response
 			{
 				if ($this->_createDocuments)
 				{
-					$document = new Apache_Solr_Document();
+					$document = new Document();
 				}
 				else
 				{

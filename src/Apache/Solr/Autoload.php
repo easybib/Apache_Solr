@@ -60,7 +60,7 @@ class Autoload
      */
     public function load($class)
     {
-        if (strpos($class, 'Apache_Solr') === false) {
+        if (strpos($class, 'Apache\Solr') === false) {
             return false;
         }
         $base = dirname(dirname(dirname(__DIR__)));
@@ -69,7 +69,7 @@ class Autoload
         } else {
             $base .= '/src';
         }
-        $file = str_replace('_', '/', $class);
+        $file = str_replace('\\', '/', $class);
         return include $base . '/' . $file . '.php';
     }
 }

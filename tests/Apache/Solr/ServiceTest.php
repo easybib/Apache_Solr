@@ -34,29 +34,32 @@
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
+namespace Apache\Solr;
 
+use Apache\Solr\Service;
+use Guzzle\Http\Client;
 /**
- * Apache_Solr_Service Unit Test
+ * Service Unit Test
  */
-class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
+class ServiceTest extends ServiceAbstractTest
 {
     public function getFixture()
     {
-        return new Apache_Solr_Service();
+        return new Service();
     }
 
 	public function testGetHttpTransportWithDefaultConstructor()
 	{
-		$fixture       = new Apache_Solr_Service();
+		$fixture       = new Service();
 		$httpTransport = $fixture->getHttpClient();
 		$this->assertInstanceOf('\Guzzle\Http\Client', $httpTransport, 'Default http transport does not implement interface');
 	}
 
 	public function testAccept()
 	{
-		$newTransport = new \Guzzle\Http\Client();
+		$newTransport = new Client();
 
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$fixture->accept($newTransport);
 
 		$httpTransport = $fixture->getHttpClient();
@@ -65,9 +68,9 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	
 	public function testAcceptWithConstructor()
 	{
-		$newTransport = new \Guzzle\Http\Client();
+		$newTransport = new Client();
 		
-		$fixture = new Apache_Solr_Service('localhost', 8180, '/solr/', $newTransport);
+		$fixture = new Service('localhost', 8180, '/solr/', $newTransport);
 		
 		$fixture->accept($newTransport);
 		$httpTransport = $fixture->getHttpClient();
@@ -94,18 +97,18 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$fixture = $this->getFixture();
 		
-		$this->assertEquals(Apache_Solr_Service::NAMED_LIST_MAP, $fixture->getNamedListTreatment());
+		$this->assertEquals(Service::NAMED_LIST_MAP, $fixture->getNamedListTreatment());
 	}
 	
 	public function testSetNamedListTreatment()
 	{
 		$fixture = $this->getFixture();
 		
-		$fixture->setNamedListTreatment(Apache_Solr_Service::NAMED_LIST_FLAT);
-		$this->assertEquals(Apache_Solr_Service::NAMED_LIST_FLAT, $fixture->getNamedListTreatment());
+		$fixture->setNamedListTreatment(Service::NAMED_LIST_FLAT);
+		$this->assertEquals(Service::NAMED_LIST_FLAT, $fixture->getNamedListTreatment());
 		
-		$fixture->setNamedListTreatment(Apache_Solr_Service::NAMED_LIST_MAP);
-		$this->assertEquals(Apache_Solr_Service::NAMED_LIST_MAP, $fixture->getNamedListTreatment());
+		$fixture->setNamedListTreatment(Service::NAMED_LIST_MAP);
+		$this->assertEquals(Service::NAMED_LIST_MAP, $fixture->getNamedListTreatment());
 	}
 	
 	/**
@@ -120,20 +123,20 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	
 	//================================================================//
 	// END SECTION OF CODE THAT SHOULD BE MOVED                       //
-	//   Apache_Solr_Service_Balancer will need functions added       //
+	//   Service_Balancer will need functions added       //
 	//================================================================//
 	
 
 	public function testConstructorDefaultArguments()
 	{
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		
-		$this->assertInstanceOf('Apache_Solr_Service', $fixture);
+		$this->assertInstanceOf('\Apache\Solr\Service', $fixture);
 	}
 
 	public function testGetHostWithDefaultConstructor()
 	{
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$host = $fixture->getHost();
 		
 		$this->assertEquals("localhost", $host);
@@ -143,7 +146,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$newHost = "example.com";
 		
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$fixture->setHost($newHost);
 		$host = $fixture->getHost();
 		
@@ -155,7 +158,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	 */
 	public function testSetEmptyHost()
 	{
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		
 		// should throw an invalid argument exception
 		$fixture->setHost("");
@@ -165,7 +168,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$newHost = "example.com";
 		
-		$fixture = new Apache_Solr_Service($newHost);
+		$fixture = new Service($newHost);
 		$host = $fixture->getHost();
 		
 		$this->assertEquals($newHost, $host);
@@ -173,7 +176,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	
 	public function testGetPortWithDefaultConstructor()
 	{
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$port = $fixture->getPort();
 		
 		$this->assertEquals(8180, $port);
@@ -183,7 +186,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$newPort = 12345;
 		
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$fixture->setPort($newPort);
 		$port = $fixture->getPort();
 		
@@ -195,7 +198,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	 */
 	public function testSetPortWithInvalidArgument()
 	{
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		
 		$fixture->setPort("broken");
 	}
@@ -204,7 +207,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$newPort = 12345;
 		
-		$fixture = new Apache_Solr_Service('locahost', $newPort);
+		$fixture = new Service('locahost', $newPort);
 		$port = $fixture->getPort();
 		
 		$this->assertEquals($newPort, $port);
@@ -212,7 +215,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 		
 	public function testGetPathWithDefaultConstructor()
 	{
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$path = $fixture->getPath();
 		
 		$this->assertEquals("/solr/", $path);
@@ -222,7 +225,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$newPath = "/new/path/";
 		
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$fixture->setPath($newPath);
 		$path = $fixture->getPath();
 		
@@ -234,7 +237,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 		$newPath = "new/path";
 		$containedPath = "/{$newPath}/";
 		
-		$fixture = new Apache_Solr_Service();
+		$fixture = new Service();
 		$fixture->setPath($newPath);
 		$path = $fixture->getPath();
 		
@@ -245,7 +248,7 @@ class Apache_Solr_ServiceTest extends Apache_Solr_ServiceAbstractTest
 	{
 		$newPath = "/new/path/";
 		
-		$fixture = new Apache_Solr_Service('localhost', 8180, $newPath);
+		$fixture = new Service('localhost', 8180, $newPath);
 		$path = $fixture->getPath();
 		
 		$this->assertEquals($newPath, $path);

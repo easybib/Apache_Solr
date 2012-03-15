@@ -35,15 +35,19 @@
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
 
+namespace Apache\Solr;
+
+use Apache\Solr\Document;
+
 /**
- * Apache_Solr_Document Unit Test
+ * Document Unit Test
  */
-class Apache_Solr_DocumentTest extends PHPUnit_Framework_TestCase
+class DocumentTest extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * Fixture used for testing
 	 *
-	 * @var Apache_Solr_Document
+	 * @var Document
 	 */
 	private $_fixture;
 
@@ -52,7 +56,7 @@ class Apache_Solr_DocumentTest extends PHPUnit_Framework_TestCase
 	 */
 	protected function setup()
 	{
-		$this->_fixture = new Apache_Solr_Document();
+		$this->_fixture = new Document();
 	}
 
 	/**

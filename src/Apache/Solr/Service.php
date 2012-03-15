@@ -35,9 +35,12 @@
  * @subpackage Solr
  * @author Donovan Jimenez <djimenez@conduit-it.com>
  */
+namespace Apache\Solr;
 
 use Guzzle\Http\Client;
 use Guzzle\Http\Message\Request;
+
+use Apache\Solr\InvalidArgumentException;
 
 /**
  * Starting point for the Solr API. Represents a Solr server resource and has
@@ -74,7 +77,7 @@ use Guzzle\Http\Message\Request;
  *
  * @todo Support auth again.
  */
-class Apache_Solr_Service
+class Service
 {
 	/**
 	 * SVN Revision meta data for this class
@@ -651,22 +654,22 @@ class Apache_Solr_Service
 	 * the facet counts format.
 	 *
 	 * @param string $namedListTreatment
-	 * @throws Apache_Solr_InvalidArgumentException If invalid option is set
+	 * @throws InvalidArgumentException If invalid option is set
 	 */
 	public function setNamedListTreatment($namedListTreatment)
 	{
 		switch ((string) $namedListTreatment)
 		{
-			case Apache_Solr_Service::NAMED_LIST_FLAT:
-				$this->_namedListTreatment = Apache_Solr_Service::NAMED_LIST_FLAT;
+			case self::NAMED_LIST_FLAT:
+				$this->_namedListTreatment = self::NAMED_LIST_FLAT;
 				break;
 
-			case Apache_Solr_Service::NAMED_LIST_MAP:
-				$this->_namedListTreatment = Apache_Solr_Service::NAMED_LIST_MAP;
+			case self::NAMED_LIST_MAP:
+				$this->_namedListTreatment = self::NAMED_LIST_MAP;
 				break;
 
 			default:
-				throw new Apache_Solr_InvalidArgumentException('Not a valid named list treatement option');
+				throw new InvalidArgumentException('Not a valid named list treatement option');
 		}
 	}
 
