@@ -440,13 +440,16 @@ class Apache_Solr_Service
      * Returns an instance of the http client, with baseUrl.
      *
      * @return \Guzzle\Service\Client
+     * @todo   HTTPS?
      */
     public function getHttpClient()
     {
-        if ($this->client === null) {
-            $baseUrl          = sprintf("http://%s:%s", $this->getHost(), $this->getPort());
-            $this->httpClient = new Client($url);
-            $this->httpClient->setUserAgent('Apache_Solr');
+        if ($this->httpClient === null) {
+
+            $baseUrl = sprintf("%s://%s:%s", $this->scheme, $this->getHost(), $this->getPort());
+
+            $this->httpClient = new Client($baseUrl);
+            $this->httpClient->setUserAgent('Apache_Solr_Service/@package_version@');
         }
         return $this->httpClient;
     }
@@ -705,20 +708,15 @@ class Apache_Solr_Service
 	public function ping($timeout = 2)
 	{
 		$start = microtime(true);
-		
-		$httpTransport = $this->getHttpTransport();
 
-		$httpResponse = $httpTransport->performHeadRequest($this->_pingUrl, $timeout);
-		$solrResponse = new Apache_Solr_Response($httpResponse, $this->_createDocuments, $this->_collapseSingleValueArrays);
+		$client  = $this->getHttpClient();
+        $request = $client->head($this->_pingUrl);
 
-		if ($solrResponse->getHttpStatus() == 200)
-		{
+        $response = $this->makeRequest($request, $timeout);
+		if ($response->getStatusCode() == 200) {
 			return microtime(true) - $start;
 		}
-		else
-		{
-			return false;
-		}
+        return false;
 	}
 
 	/**
@@ -1159,13 +1157,12 @@ class Apache_Solr_Service
 			$params = array();
 		}
 
-		$httpTransport = $this->getHttpTransport();
-		
-		// read the contents of the URL using our configured Http Transport and default timeout
-		$httpResponse = $httpTransport->performGetRequest($url);
-		
+		$client   = $this->getHttpClient();
+		$request  = $client->get($url);
+        $response = $this->makeRequest($request);
+
 		// check that its a 200 response
-		if ($httpResponse->getStatusCode() == 200)
+		if ($response->getStatusCode() == 200)
 		{
 			// add the resource.name parameter if not specified
 			if (!isset($params['resource.name']))
@@ -1174,12 +1171,9 @@ class Apache_Solr_Service
 			}
 
 			// delegate the rest to extractFromString
-			return $this->extractFromString($httpResponse->getBody(), $params, $document, $mimetype);
+			return $this->extractFromString($response->getBody(), $params, $document, $mimetype);
 		}
-		else
-		{
-			throw new Apache_Solr_InvalidArgumentException("URL '{$url}' returned non 200 response code");
-		}
+        throw new Apache_Solr_InvalidArgumentException("URL '{$url}' returned non 200 response code");
 	}
 
 	/**
