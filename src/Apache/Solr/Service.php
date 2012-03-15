@@ -168,13 +168,6 @@ class Service
 	 */
 	protected $_urlsInited = false;
 
-	/**
-	 * HTTP Transport implementation (pluggable)
-	 *
-	 * @var Apache_Solr_HttpTransport_Interface
-	 */
-	protected $_httpTransport = false;
-
     /**
      * @var \Guzzle\Http\Client $httpClient
      */
