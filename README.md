@@ -1,3 +1,6 @@
 ## Apache_Solr
 
-I imported this lib here to replace the HTTP client layer.
+Instead of using a home-grown funky HTTP layer, I decided to use Guzzle.
+
+Guzzle is cURL only, but offers many features and lots of flexibility down the road.
+
